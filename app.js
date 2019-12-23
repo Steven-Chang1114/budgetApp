@@ -1,6 +1,60 @@
 //Budget
 var budgetController = (function(){
 
+    var Expense = function(id, description, value){
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    }
+
+    var Income = function(id, description, value){
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    }
+
+    var data = {
+        allItems: {
+            exp: [],
+            inc: []
+        },
+
+       totals: {
+           exp: 0,
+           inc: 0
+       }  
+    }
+
+    return{
+        addItems: function(type, des, val){
+            var newItem, ID, lastItem
+
+            lastItem = data.allItems[type];
+
+            //Create new Id
+            if (lastItem.length == 0){
+                ID = 0;
+            }else{
+                ID = lastItem[lastItem.length-1].id + 1;
+            }
+
+            //Create new Item
+            if(type == "exp"){
+                newItem = new Expense(ID, des, val); 
+            }else{
+                newItem = new Income(ID, des, val);
+            }
+
+            data.allItems[type].push(newItem);
+
+            return newItem;
+        },
+
+        testing: function(){
+            console.log(data);
+        }
+    }
+
 })()
 
 
@@ -50,7 +104,11 @@ var controller = (function(budget, ui){
     }
 
     function ctrlAddItem(){
-        var input = ui.getInput();
+        var input, newItem
+        
+        input = ui.getInput();
+
+        newItem = budget.addItems(input.type, input.description, input.value);
     }
 
     return{
