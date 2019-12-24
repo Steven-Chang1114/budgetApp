@@ -66,7 +66,9 @@ var UICntroller = (function(){
         inputType: ".add__type",
         inputDescription: ".add__description",
         inputValue: ".add__value",
-        inputBtn: ".add__btn"
+        inputBtn: ".add__btn",
+        incomeContainer: ".income__list",
+        expenseContainer: ".expenses__list"
     };
 
     return{
@@ -76,6 +78,40 @@ var UICntroller = (function(){
                 description: document.querySelector(DOMstr.inputDescription).value,
                 value: document.querySelector(DOMstr.inputValue).value
             }
+        },
+
+        addListItem: function(item, type){
+            var html, newHtml, element;
+
+            if (type == "inc"){
+                element = DOMstr.incomeContainer; 
+                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            }else{
+                element = DOMstr.expenseContainer;
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            }
+
+            newHtml = html.replace('%id%',  item.id);
+            newHtml = newHtml.replace('%description%', item.description);
+            newHtml = newHtml.replace('%value%', item.value);
+
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml); 
+
+        },
+
+        clearFields: function(){
+            var fields, fieldsArray;
+
+            fields = document.querySelectorAll(DOMstr.inputDescription + ", " + DOMstr.inputValue); 
+
+            fieldsArray = Array.prototype.slice.call(fields);
+
+            fieldsArray.forEach(function(cur){
+                cur.value = "";
+            })
+
+            fieldsArray[0].focus();
+        
         },
 
         getDOMstr: function(){
@@ -109,6 +145,10 @@ var controller = (function(budget, ui){
         input = ui.getInput();
 
         newItem = budget.addItems(input.type, input.description, input.value);
+
+        ui.addListItem(newItem, input.type);
+
+        ui.clearFields();
     }
 
     return{
