@@ -76,7 +76,7 @@ var UICntroller = (function(){
             return{
                 type: document.querySelector(DOMstr.inputType).value,
                 description: document.querySelector(DOMstr.inputDescription).value,
-                value: document.querySelector(DOMstr.inputValue).value
+                value: parseFloat(document.querySelector(DOMstr.inputValue).value)
             }
         },
 
@@ -139,16 +139,23 @@ var controller = (function(budget, ui){
         });
     }
 
+    var updateBudget = function(){
+         
+    }
+
     function ctrlAddItem(){
         var input, newItem
         
         input = ui.getInput();
 
-        newItem = budget.addItems(input.type, input.description, input.value);
+        if (input.description != "" && !isNaN(input.value) && input.value > 0){
 
-        ui.addListItem(newItem, input.type);
+            newItem = budget.addItems(input.type, input.description, input.value);
 
-        ui.clearFields();
+            ui.addListItem(newItem, input.type);
+
+            ui.clearFields();
+        }
     }
 
     return{
