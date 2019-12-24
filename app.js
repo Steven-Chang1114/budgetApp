@@ -106,7 +106,8 @@ var UICntroller = (function(){
         totalValue: ".budget__value",
         incomeValue: ".budget__income--value",
         expenseValue: ".budget__expenses--value",
-        expensePercentage: ".budget__expenses--percentage"
+        expensePercentage: ".budget__expenses--percentage",
+        container: ".container"
     };
 
     return{
@@ -123,10 +124,10 @@ var UICntroller = (function(){
 
             if (type == "inc"){
                 element = DOMstr.incomeContainer; 
-                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }else{
                 element = DOMstr.expenseContainer;
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }
 
             newHtml = html.replace('%id%',  item.id);
@@ -189,6 +190,9 @@ var controller = (function(budget, ui){
                 ctrlAddItem();
             }
         });
+
+        document.querySelector(DOM.container).addEventListener("click", ctrlDeleteItem)
+
     }
 
     var updateBudget = function(){
@@ -220,6 +224,18 @@ var controller = (function(budget, ui){
         }
     }
 
+    function ctrlDeleteItem(event){
+        var itemId, splitId, type, id;
+
+        itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+        if (itemId){
+            splitId = itemId.split("-");
+            type = splitId[0]
+            id = splitId[1]
+        }
+    }
+
     return{
         init: function(){
             ui.displayBudget({
@@ -230,7 +246,7 @@ var controller = (function(budget, ui){
             });
              setUpEventListeners();
         }
-    }
+    } 
 
 })(budgetController, UICntroller)
 
