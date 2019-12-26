@@ -1,10 +1,11 @@
 //Budget
 var budgetController = (function(){
 
-    var Expense = function(id, description, value){
+    var Expense = function(id, description, value, date){
         this.id = id;
         this.description = description;
         this.value = value;
+        this.date = date;
         this.percentage = -1;
     }
 
@@ -23,10 +24,11 @@ var budgetController = (function(){
         return this.percentage;
     }
 
-    var Income = function(id, description, value){
+    var Income = function(id, description, value, date){
         this.id = id;
         this.description = description;
         this.value = value;
+        this.date = date;
     }
 
     var data = {
@@ -53,7 +55,7 @@ var budgetController = (function(){
     }
 
     return{
-        addItems: function(type, des, val){
+        addItems: function(type, des, val, date){
             var newItem, ID, lastItem
 
             lastItem = data.allItems[type];
@@ -67,9 +69,9 @@ var budgetController = (function(){
 
             //Create new Item
             if(type == "exp"){
-                newItem = new Expense(ID, des, val); 
+                newItem = new Expense(ID, des, val, date); 
             }else{
-                newItem = new Income(ID, des, val);
+                newItem = new Income(ID, des, val, date);
             }
 
             data.allItems[type].push(newItem);
@@ -159,7 +161,8 @@ var UICntroller = (function(){
         expensePercentage: ".budget__expenses--percentage",
         container: ".container",
         itemPercentage: ".item__percentage",
-        date: ".budget__title--month"
+        date: ".budget__title--month",
+        showDate: ".item__date"
     };
 
     var formatNumber = function(num, type){
@@ -239,10 +242,10 @@ var UICntroller = (function(){
 
             if (type == "inc"){
                 element = DOMstr.incomeContainer; 
-                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class = "item__date">%date%</div><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }else{
                 element = DOMstr.expenseContainer;
-                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class = "item__date">%date%</div><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }
 
             value = formatNumber(item.value, type);
@@ -250,6 +253,7 @@ var UICntroller = (function(){
             newHtml = html.replace('%id%',  item.id);
             newHtml = newHtml.replace('%description%', item.description);
             newHtml = newHtml.replace('%value%', value);
+            newHtml = newHtml.replace('%date%', item.date);
 
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml); 
 
@@ -374,6 +378,20 @@ var controller = (function(budget, ui){
 
     }
 
+    var getDate = function(){
+        var curDate, year, month, months;
+
+        curDate = new Date();
+
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+        year = curDate.getFullYear();
+        month = curDate.getMonth();
+
+        return months[month] + " " + year;
+
+    }
+
     var updateBudget = function(){
         var allBudget
 
@@ -396,13 +414,15 @@ var controller = (function(budget, ui){
     }
 
     function ctrlAddItem(){
-        var input, newItem
+        var input, newItem, date
         
         input = ui.getInput();
 
+        date = getDate();
+
         if (input.description != "" && !isNaN(input.value) && input.value > 0){
 
-            newItem = budget.addItems(input.type, input.description, input.value);
+            newItem = budget.addItems(input.type, input.description, input.value, date);
 
             ui.addListItem(newItem, input.type);
 
