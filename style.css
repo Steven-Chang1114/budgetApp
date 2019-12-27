@@ -23,6 +23,7 @@ body {
     font-weight: 400;
 }
 
+.center{ float: right;}
 .right { float: right; }
 .red { color: #FF5049 !important; }
 .red-focus:focus { border: 1px solid #FF5049 !important; }
@@ -209,8 +210,6 @@ h2 {
 
 .item__date {
     float: left;
-    margin-right: 50px;
-    transition: transform 0.3s;
 }
 
 .item:first-child { border-top: 1px solid #e7e7e7; }
@@ -218,6 +217,7 @@ h2 {
 
 .item__description {
     float: left;
+    padding-left: 20px;
 }
 
 .item__value {
@@ -270,6 +270,7 @@ h2 {
 .item:hover .item__delete--btn { display: block; }
 .item:hover .item__value { transform: translateX(-20px); }
 .item:hover .item__percentage { transform: translateX(-20px); }
+.item:hover .item__value { transform: translateX(-20px); }
 
 
 .unpaid {
