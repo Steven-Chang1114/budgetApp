@@ -12,6 +12,7 @@ var budgetController = (function(){
     Expense.prototype.calcPercentage = function(totalIncome){
 
         if (totalIncome > 0) {
+            console.log(this.value)
             this.percentage = Math.round(this.value / totalIncome * 100);
         }else{
             this.percentage = -99;
@@ -55,18 +56,64 @@ var budgetController = (function(){
     }
 
     return{
-        addExpData: function(){
+        getData: function(){
+            return data
+        },
+
+        saveBudget: function(){
+            localStorage.setItem('budget', JSON.stringify(data.budget))
+        },
+
+        savePercentage: function(){
+            localStorage.setItem('percentage', JSON.stringify(data.percentage))
+        },
+
+        saveExp: function(){
+            localStorage.setItem('totalExp', JSON.stringify(data.totals.exp))
+        },
+
+        saveInc: function(){
+            localStorage.setItem('totalInc', JSON.stringify(data.totals.inc))
+        },
+
+        saveExpData: function(){
             localStorage.setItem('exp', JSON.stringify(data.allItems.exp))
         },
     
-        addIncData: function(){
+        saveIncData: function(){
             localStorage.setItem('inc', JSON.stringify(data.allItems.inc))
+        },
+
+        readExp: function(){
+            return JSON.parse(localStorage.getItem('totalExp'))
+        },
+
+        readInc: function(){
+            return JSON.parse(localStorage.getItem('totalInc'))
+        },
+
+        readPercentage: function(){
+            return JSON.parse(localStorage.getItem('percentage'))
+        },
+
+        readBudget: function(){
+            return JSON.parse(localStorage.getItem('budget'))
+        },
+
+        readIncData: function(){
+            return JSON.parse(localStorage.getItem('inc'))
+        },
+
+        readExpData: function(){
+            return JSON.parse(localStorage.getItem('exp'))
         },
 
         addItems: function(type, des, val, date){
             var newItem, ID, lastItem
 
             lastItem = data.allItems[type];
+            console.log(lastItem)
+            console.log(data.allItems)
 
             //Create new Id
             if (lastItem.length == 0){
@@ -119,8 +166,10 @@ var budgetController = (function(){
             var totalIncome
 
             totalIncome = data.totals.inc;
+            console.log(totalIncome)
 
             data.allItems.exp.forEach(function(cur){
+                console.log(cur)
                  cur.calcPercentage(totalIncome);
             })
             
@@ -370,6 +419,33 @@ var controller = (function(budget, ui){
          
         var DOM = ui.getDOMstr();
 
+        window.addEventListener('load', () => {
+            const data = budget.getData()
+            const inc = budget.readIncData()
+            const exp = budget.readExpData()
+            const totalInc = budget.readInc()
+            const totalExp = budget.readExp()
+            const percentage = budget.readPercentage()
+            const bud = budget.readBudget()
+
+            data.totals.exp = totalExp
+            data.totals.inc = totalInc
+            data.budget = bud
+            data.percentage = percentage
+            data.allItems.inc = inc
+            data.allItems.exp = exp
+
+            const allBudget = budget.getBudget();
+            ui.displayBudget(allBudget);
+
+            if(data.allItems.inc) data.allItems.inc.forEach(el => ui.addListItem(el, 'inc'))
+            
+            if(data.allItems.exp) data.allItems.exp.forEach(el => ui.addListItem(el, 'exp'))
+
+            updatePercentage()
+
+        })
+
         //Event listener for adding item
         document.querySelector(DOM.inputBtn).addEventListener("click", ctrlAddItem) ;
         document.addEventListener("keypress", function(event){
@@ -440,8 +516,12 @@ var controller = (function(budget, ui){
 
             updatePercentage();
 
-            budget.addIncData()
-            budget.addExpData()
+            budget.saveIncData()
+            budget.saveExpData()
+            budget.saveBudget()
+            budget.saveExp()
+            budget.saveInc()
+            budget.savePercentage()
 
         }
     }
@@ -465,6 +545,12 @@ var controller = (function(budget, ui){
 
         updatePercentage();
 
+        budget.saveIncData()
+        budget.saveExpData()
+        budget.saveBudget()
+        budget.saveExp()
+        budget.saveInc()
+        budget.savePercentage()
     }
 
     return{
