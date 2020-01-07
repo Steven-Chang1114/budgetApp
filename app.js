@@ -9,21 +9,26 @@ var budgetController = (function(){
         this.percentage = -1;
     }
 
-    Expense.prototype.calcPercentage = function(totalIncome){
+    /** 
+    var calcPercentage = function(totalIncome){
 
-        if (totalIncome > 0) {
-            console.log(this.value)
-            this.percentage = Math.round(this.value / totalIncome * 100);
-        }else{
-            this.percentage = -99;
-        };
+        data.allItems.exp.forEach(cur => {
 
+            if (totalIncome > 0) {
+                cur.percentage = Math.round(cur.value / totalIncome * 100);
+            }else{
+                cur.percentage = -1;
+            };
+            
+        })
     }
-
+    */
+    /** 
     Expense.prototype.getPercentage = function(){
 
         return this.percentage;
     }
+    */
 
     var Income = function(id, description, value, date){
         this.id = id;
@@ -112,8 +117,6 @@ var budgetController = (function(){
             var newItem, ID, lastItem
 
             lastItem = data.allItems[type];
-            console.log(lastItem)
-            console.log(data.allItems)
 
             //Create new Id
             if (lastItem.length == 0){
@@ -166,19 +169,23 @@ var budgetController = (function(){
             var totalIncome
 
             totalIncome = data.totals.inc;
-            console.log(totalIncome)
-
+            console.log(data)
             data.allItems.exp.forEach(function(cur){
-                console.log(cur)
-                 cur.calcPercentage(totalIncome);
+
+                if (totalIncome > 0) {
+                    cur.percentage = Math.round(cur.value / totalIncome * 100);
+                }else{
+                    cur.percentage = -1;
+                };
+
             })
             
         },
 
-        getPercentage: function(){
+        getPercentages: function(){
 
             var allPercentage = data.allItems.exp.map(function(cur){
-                return cur.getPercentage();
+                return cur.percentage;
             })
 
             return allPercentage;
@@ -419,32 +426,30 @@ var controller = (function(budget, ui){
          
         var DOM = ui.getDOMstr();
 
+        
         window.addEventListener('load', () => {
             const data = budget.getData()
             const inc = budget.readIncData()
             const exp = budget.readExpData()
-            const totalInc = budget.readInc()
-            const totalExp = budget.readExp()
-            const percentage = budget.readPercentage()
-            const bud = budget.readBudget()
-
-            data.totals.exp = totalExp
-            data.totals.inc = totalInc
-            data.budget = bud
-            data.percentage = percentage
-            data.allItems.inc = inc
-            data.allItems.exp = exp
-
-            const allBudget = budget.getBudget();
-            ui.displayBudget(allBudget);
+            
+            if(inc) data.allItems.inc = inc
+            if(exp) data.allItems.exp = exp
 
             if(data.allItems.inc) data.allItems.inc.forEach(el => ui.addListItem(el, 'inc'))
             
-            if(data.allItems.exp) data.allItems.exp.forEach(el => ui.addListItem(el, 'exp'))
+            if(data.allItems.exp) {
+                data.allItems.exp.forEach(el => {
+                    ui.addListItem(el, 'exp')
+                    //document.querySelector(DOM.itemPercentage).textContent = el.percentage <= 0 ? '---' : el.percentage + "%"
+                })
+            }
 
-            updatePercentage()
+            updatePercentage();
+
+            console.log(data)
 
         })
+        
 
         //Event listener for adding item
         document.querySelector(DOM.inputBtn).addEventListener("click", ctrlAddItem) ;
@@ -491,7 +496,8 @@ var controller = (function(budget, ui){
 
         budget.calculatePercentage();
 
-        allPercentage = budget.getPercentage();
+        var allPercentage = budget.getPercentages();
+        console.log(allPercentage)
 
         ui.displayPercentage(allPercentage);
         
@@ -528,22 +534,28 @@ var controller = (function(budget, ui){
 
     function ctrlDeleteItem(event){
         var itemId, splitId, type, id;
+        console.log(event.target)
 
-        itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
-
-        if (itemId){
-            splitId = itemId.split("-");
-            type = splitId[0]
-            id = parseInt(splitId[1]);
+        if (event.target.matches('.item__delete, .item__delete *')){
+            itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+            console.log(itemId)
+            if (itemId){
+                splitId = itemId.split("-");
+                type = splitId[0]
+                id = parseInt(splitId[1]);
+            }
+    
+            budget.deleteItem(type, id);
+    
+            ui.deleteListItem(itemId);
+    
+            updateBudget();
+    
+            updatePercentage();
         }
+        
 
-        budget.deleteItem(type, id);
-
-        ui.deleteListItem(itemId);
-
-        updateBudget();
-
-        updatePercentage();
+        
 
         budget.saveIncData()
         budget.saveExpData()
@@ -555,12 +567,29 @@ var controller = (function(budget, ui){
 
     return{
         init: function(){
+            const data = budget.getData()
+
+            data.budget = budget.readBudget() ? budget.readBudget() : 0
+            data.percentage = budget.readPercentage() ? budget.readPercentage() : -1
+            data.totals.exp = budget.readExp() ? budget.readExp() : 0
+            data.totals.inc = budget.readInc() ? budget.readInc() : 0
+
             ui.displayBudget({
-                budget: 0,
-                totalInc: 0,
-                totalExp: 0,
-                percentage: "---"
+                budget: budget.readBudget() ? budget.readBudget() : 0,
+                totalInc: budget.readInc() ? budget.readInc() : 0,
+                totalExp: budget.readExp() ? budget.readExp() : 0,
+                percentage: budget.readPercentage() ? budget.readPercentage() : "---"
             });
+
+            /** 
+            if(budget.readIncData()){
+                data.allItems.inc.forEach(el => ui.addListItem(el, 'inc'))
+            }
+
+            if(budget.readExpData()){
+                data.allItems.exp.forEach(el => ui.addListItem(el, 'exp'))
+            }
+            */
             
             ui.displayMonth();
 
