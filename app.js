@@ -55,6 +55,14 @@ var budgetController = (function(){
     }
 
     return{
+        addExpData: function(){
+            localStorage.setItem('exp', JSON.stringify(data.allItems.exp))
+        },
+    
+        addIncData: function(){
+            localStorage.setItem('inc', JSON.stringify(data.allItems.inc))
+        },
+
         addItems: function(type, des, val, date){
             var newItem, ID, lastItem
 
@@ -431,6 +439,9 @@ var controller = (function(budget, ui){
             updateBudget();
 
             updatePercentage();
+
+            budget.addIncData()
+            budget.addExpData()
 
         }
     }
