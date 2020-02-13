@@ -237,6 +237,10 @@ h2 {
     text-align: center;
 }
 
+ion-icon {
+    --ionicon-stroke-width: 106px;
+  }
+
 .income .item__value,
 .income .item__delete--btn {
     color: rgb(40, 185, 86);
