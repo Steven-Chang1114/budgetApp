@@ -601,3 +601,4 @@ var controller = (function(budget, ui){
 
 //Onle line of code outside of the controllers
 controller.init();
+console.log(this)
